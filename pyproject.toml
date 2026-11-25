@@ -1,0 +1,13 @@
+[project]
+name = "prediction-market-tracker"
+version = "0.1.0"
+description = "Daily tracker of Polymarket prediction-market odds"
+requires-python = ">=3.11"
+dependencies = ["requests>=2.31"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
