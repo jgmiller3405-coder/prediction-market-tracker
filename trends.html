@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odds Tracker – Trends</title>
+<meta name="description" content="What the history of prediction-market odds shows, computed in your browser.">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main>
+  <h1>Trends</h1>
+  <p class="lede" id="info">Loading…</p>
+  <div id="error" class="error"></div>
+
+  <h2>Every value over time</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>Value<select id="val"></select></label>
+      <button id="sel-top" type="button">Top 6 by volume</button>
+      <button id="sel-all" type="button">All items</button>
+      <button id="sel-none" type="button">None</button>
+    </div>
+    <div class="picker" id="picker"></div>
+    <div class="chart-box"><canvas id="main"></canvas></div>
+  </div>
+
+  <div id="sections"></div>
+</main>
+<script src="vendor/chart.umd.js"></script>
+<script src="lib.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const charts = {};
+  function draw(id, config) {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart($(id), config);
+  }
+  const short = (s, n = 34) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
+
+  function mainChart(rows, ds, items, picked) {
+    const p = palette(), key = $("val").value, meta = RC.NUMERIC.find((n) => n.key === key);
+    const datasets = items.filter((it) => picked.has(it.item_id)).map((it, i) => ({
+      label: short(it.item), borderColor: p.series[i % 8], backgroundColor: p.series[i % 8], tension: 0.15, spanGaps: true, pointRadius: 3,
+      data: ds.map((d) => { const r = rows.find((x) => x.date === d && x.item_id === it.item_id); return r ? r[key] : null; }),
+    }));
+    draw("main", { type: "line", data: { labels: ds, datasets },
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "nearest", intersect: false },
+        scales: { y: { title: { display: true, text: meta.label + " (" + meta.unit + ")" } } }, plugins: { legend: { position: "bottom" } } } });
+  }
+
+  function section(id, heading, html) {
+    $("sections").insertAdjacentHTML("beforeend",
+      `<h2>${esc(heading)}</h2><div class="panel">${html}<div class="chart-box" style="height:300px"><canvas id="${id}"></canvas></div></div>`);
+  }
+  const bar = (labels, data, colors, horizontal, ytitle) => ({ type: "bar", data: { labels, datasets: [{ data, backgroundColor: colors }] },
+    options: { indexAxis: horizontal ? "y" : "x", responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { [horizontal ? "x" : "y"]: { title: { display: !!ytitle, text: ytitle || "" } } } } });
+
+  try {
+    const { rows, status } = await loadData();
+    const ds = RC.dates(rows), last = ds[ds.length - 1], p = styleChart();
+    $("info").textContent = rows.length + " rows · " + ds.length + " day" + (ds.length === 1 ? "" : "s") + " (" + ds[0] + " to " + last + "). Every number on this page is computed in your browser from data/history.csv.";
+
+    // ----- picker + main chart
+    const latestRows = RC.onDate(rows, last);
+    const items = [...new Map(rows.map((r) => [r.item_id, r])).values()].sort((a, b) => a.event.localeCompare(b.event) || a.item.localeCompare(b.item));
+    $("val").innerHTML = RC.NUMERIC.map((n) => `<option value="${n.key}">${n.label}</option>`).join("");
+    const picked = new Set();
+    const top = () => { picked.clear(); [...latestRows].sort((a, b) => (b.volume_24h_usd || 0) - (a.volume_24h_usd || 0)).slice(0, 6).forEach((r) => picked.add(r.item_id)); };
+    let g = "";
+    $("picker").innerHTML = items.map((it) => {
+      const head = it.event !== g ? `<div class="grp">${esc(it.event)}</div>` : "";
+      g = it.event;
+      return head + `<label><input type="checkbox" value="${esc(it.item_id)}"> ${esc(it.item.split(": ").slice(1).join(": "))}</label>`;
+    }).join("");
+    const sync = () => { $("picker").querySelectorAll("input").forEach((c) => (c.checked = picked.has(c.value))); mainChart(rows, ds, items, picked); };
+    $("picker").addEventListener("change", (e) => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); mainChart(rows, ds, items, picked); });
+    $("val").addEventListener("change", () => mainChart(rows, ds, items, picked));
+    $("sel-top").onclick = () => { top(); sync(); };
+    $("sel-all").onclick = () => { items.forEach((i) => picked.add(i.item_id)); sync(); };
+    $("sel-none").onclick = () => { picked.clear(); sync(); };
+    top(); sync();
+
+    // ----- 1. since the first run
+    const sf = RC.sinceFirst(rows).sort((a, b) => b.delta - a.delta);
+    if (ds.length < 2) {
+      section("c1", "Nothing has moved since the first run yet: only one day of history", `<p>The history holds a single day (${last}), so there is no change to measure. This section fills in from the second day.</p><p class="how">How it is computed: for each item, the latest Yes probability minus its Yes probability on its first date in the history file.</p>`);
+      draw("c1", bar(sf.slice(0, 8).map((s) => short(s.item, 28)), sf.slice(0, 8).map(() => 0), p.accent, true, "change in Yes % (pts)"));
+    } else {
+      const up = sf[0], dn = sf[sf.length - 1];
+      section("c1", `${up.item} rose the most since the first run: ${RC.signed(up.delta)} pts`,
+        `<p>From ${up.firstDate} to ${up.lastDate} its Yes probability went from ${RC.num(up.first)}% to ${RC.num(up.last)}%. The largest fall was ${esc(dn.item)} at ${RC.signed(dn.delta)} pts (${RC.num(dn.first)}% to ${RC.num(dn.last)}%). The chart shows the five biggest rises and the five biggest falls.</p>
+         <p class="how">How it is computed: for each item, latest yes_pct minus yes_pct on its first date in data/history.csv, in percentage points.</p>`);
+      const pick = [...sf.slice(0, 5), ...sf.slice(-5)].filter((v, i, a) => a.findIndex((x) => x.item_id === v.item_id) === i);
+      draw("c1", bar(pick.map((s) => short(s.item, 28)), pick.map((s) => s.delta), pick.map((s) => (s.delta >= 0 ? p.up : p.down)), true, "change in Yes % (pts)"));
+    }
+
+    // ----- 2. day with the biggest move
+    const dm = RC.dailyMoves(rows);
+    if (!dm.length) {
+      section("c2", "The day with the biggest move needs at least two days of history", `<p>Only ${ds.length} day is in the history, so there is no day-to-day change yet.</p><p class="how">How it is computed: for each pair of consecutive dates, the mean of |yes_pct today − yes_pct yesterday| over items present on both days.</p>`);
+      draw("c2", bar([last], [0], p.accent, false, "mean |change| (pts)"));
+    } else {
+      const best = dm.reduce((a, b) => (b.value > a.value ? b : a));
+      section("c2", `${best.date} was the day with the biggest move: ${RC.num(best.value)} pts on average`,
+        `<p>Across the ${best.n} items present on both ${best.prev} and ${best.date}, the Yes probability moved by ${RC.num(best.value)} points on average (absolute change). The quietest day was ${dm.reduce((a, b) => (b.value < a.value ? b : a)).date} at ${RC.num(Math.min(...dm.map((d) => d.value)))} points.</p>
+         <p class="how">How it is computed: for each pair of consecutive dates in data/history.csv, the mean of |yes_pct on the later day − yes_pct on the earlier day| over items present on both days.</p>`);
+      draw("c2", bar(dm.map((d) => d.date), dm.map((d) => d.value), p.accent, false, "mean |change| (pts)"));
+    }
+
+    // ----- 3. how far apart the items are
+    const sp = RC.spreadOn(rows, last);
+    section("c3", `On ${last} the items span ${RC.num(sp.spread)} points of probability`,
+      `<p>The lowest is ${esc(sp.min.item)} at ${RC.num(sp.min.yes_pct)}% and the highest is ${esc(sp.max.item)} at ${RC.num(sp.max.yes_pct)}%, across ${sp.n} items. The standard deviation is ${RC.num(sp.sd)} points. The chart counts items in each 10-point band of Yes probability.</p>
+       <p class="how">How it is computed: on the latest date in data/history.csv, max(yes_pct) − min(yes_pct); the sample standard deviation of yes_pct; items are binned as floor(yes_pct / 10).</p>`);
+    draw("c3", bar(sp.bins.map((_, i) => `${i * 10}–${i * 10 + 10}%`), sp.bins, p.accent, false, "number of items"));
+
+    // ----- 4. volume by event
+    const vb = RC.volumeByEvent(rows, last);
+    const lead = vb.list[0];
+    section("c4", `${lead.event} draws ${RC.num(lead.share * 100, 1)}% of the 24-hour trading volume`,
+      `<p>On ${last} the tracked markets traded ${RC.usd(vb.total)} in 24 hours. ${esc(lead.event)} accounted for ${RC.usd(lead.volume)}; the smallest event, ${esc(vb.list[vb.list.length - 1].event)}, accounted for ${RC.usd(vb.list[vb.list.length - 1].volume)}.</p>
+       <p class="how">How it is computed: on the latest date in data/history.csv, the sum of volume_24h_usd for the items of each event, divided by the sum over all items.</p>`);
+    draw("c4", bar(vb.list.map((v) => short(v.event, 30)), vb.list.map((v) => v.volume), p.accent, true, "24h volume ($)"));
+
+    // ----- 5. volatility
+    const vol = RC.volatility(rows).sort((a, b) => b.sd - a.sd);
+    if (ds.length < 3) {
+      section("c5", "Volatility needs at least three days of history", `<p>Standard deviation of day-to-day changes needs two or more changes; the history has ${ds.length} day${ds.length === 1 ? "" : "s"}. This section fills in as the history grows.</p><p class="how">How it is computed: for each item, the sample standard deviation of its day-to-day changes in yes_pct.</p>`);
+      draw("c5", bar(vol.slice(0, 8).map((v) => short(v.item, 28)), vol.slice(0, 8).map(() => 0), p.accent, true, "st. dev. of daily change (pts)"));
+    } else {
+      const v0 = vol[0];
+      section("c5", `${v0.item} is the most volatile item: ${RC.num(v0.sd)} pts of daily swing`,
+        `<p>Its Yes probability changed by a standard deviation of ${RC.num(v0.sd)} points from one day to the next (${v0.changes} changes). The calmest item is ${esc(vol[vol.length - 1].item)} at ${RC.num(vol[vol.length - 1].sd)} points.</p>
+         <p class="how">How it is computed: for each item, the sample standard deviation of (yes_pct on a day − yes_pct on the previous day) over all days in data/history.csv.</p>`);
+      draw("c5", bar(vol.slice(0, 8).map((v) => short(v.item, 28)), vol.slice(0, 8).map((v) => v.sd), p.accent, true, "st. dev. of daily change (pts)"));
+    }
+  } catch (e) {
+    $("info").textContent = "";
+    $("error").textContent = "Could not load the data: " + e.message;
+  }
+})();
+</script>
+</body>
+</html>

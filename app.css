@@ -1,0 +1,60 @@
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --text: #16191d; --muted: #5d6673; --line: #dfe3e8;
+  --accent: #2563eb; --up: #12805c; --down: #c2362b; --warn: #b45309;
+  --s1: #2563eb; --s2: #db6d1a; --s3: #12805c; --s4: #9333ea; --s5: #c2362b; --s6: #0e8fa8; --s7: #8a6d00; --s8: #64748b;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116; --surface: #171b22; --text: #e8ebef; --muted: #98a2b0; --line: #2a313b;
+    --accent: #6ea0ff; --up: #3ecf9a; --down: #ff7a6e; --warn: #f0b04a;
+    --s1: #6ea0ff; --s2: #f0924a; --s3: #3ecf9a; --s4: #c08cff; --s5: #ff7a6e; --s6: #4fcde6; --s7: #e0c04a; --s8: #94a3b8;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font); }
+a { color: var(--accent); }
+#nav { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+.nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 20px; min-height: 52px; flex-wrap: wrap; }
+.brand { font-weight: 700; color: var(--text); text-decoration: none; }
+#nav nav { display: flex; gap: 4px; }
+#nav nav a { padding: 6px 12px; border-radius: 6px; color: var(--muted); text-decoration: none; }
+#nav nav a[aria-current="page"] { background: var(--bg); color: var(--text); font-weight: 600; }
+.net { margin-left: auto; font-size: 13px; color: var(--warn); }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 28px 0 8px; }
+.lede, .muted { color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.card .v { font-size: 24px; font-weight: 700; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+th.sort { cursor: pointer; user-select: none; }
+th.sort:hover { color: var(--text); }
+td.name { white-space: normal; min-width: 220px; }
+.up { color: var(--up); font-weight: 600; } .down { color: var(--down); font-weight: 600; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--up); }
+.dot.bad { background: var(--down); }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin: 14px 0; }
+.controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 3px; }
+input, select, button { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; }
+button { cursor: pointer; } button:hover { border-color: var(--accent); }
+.star { background: none; border: 0; font-size: 20px; line-height: 1; padding: 0 4px; color: var(--muted); }
+.star.on { color: #e0a800; }
+.chart-box { position: relative; height: 320px; }
+.picker { display: flex; flex-wrap: wrap; gap: 4px 14px; max-height: 190px; overflow: auto; padding: 8px 0; }
+.picker label { font-size: 13px; display: flex; gap: 5px; align-items: center; }
+.picker .grp { width: 100%; font-weight: 600; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.how { font-size: 13px; color: var(--muted); }
+ul.moves { list-style: none; padding: 0; margin: 0; }
+ul.moves li { padding: 7px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+ul.moves li:last-child { border-bottom: 0; }
+.error { color: var(--down); }
+@media (max-width: 600px) { h1 { font-size: 21px; } .card .v { font-size: 20px; } }

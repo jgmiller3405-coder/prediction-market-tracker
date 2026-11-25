@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odds Tracker – Browse</title>
+<meta name="description" content="Filter, search, sort and star the tracked prediction markets.">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main>
+  <h1>Browse</h1>
+  <p class="lede" id="info">Loading…</p>
+  <div id="error" class="error"></div>
+
+  <div class="controls">
+    <label>Search item name<input id="q" type="search" placeholder="e.g. bitcoin"></label>
+    <label>Event<select id="f-event"></select></label>
+    <label>Closes<select id="f-end"></select></label>
+    <label>Min Yes %<input id="f-min" type="number" min="0" max="100" step="1" placeholder="0" style="width:90px"></label>
+    <label>Min 24h volume ($)<input id="f-vol" type="number" min="0" step="1000" placeholder="0" style="width:120px"></label>
+    <label style="flex-direction:row;align-items:center;gap:6px"><input id="f-star" type="checkbox"> Shortlist only</label>
+    <button id="reset" type="button">Reset</button>
+  </div>
+  <p class="muted" id="count"></p>
+
+  <div class="table-wrap"><table id="t"><thead><tr id="head"></tr></thead><tbody></tbody></table></div>
+</main>
+<script src="lib.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  let latest = [], sortKey = "volume_24h_usd", sortDir = -1;
+  const stars = Shortlist.get();
+  const cols = [["yes_pct", "Yes %"], ["day_change_pts", "24h chg"], ["best_bid_pct", "Bid %"], ["best_ask_pct", "Ask %"],
+                ["volume_24h_usd", "24h vol"], ["volume_total_usd", "Total vol"], ["liquidity_usd", "Liquidity"]];
+
+  function head() {
+    $("head").innerHTML = '<th></th><th class="sort" data-k="item">Item</th><th>Event</th><th>Closes</th>' +
+      cols.map(([k, t]) => `<th class="sort n" data-k="${k}">${t}${sortKey === k ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("");
+    $("head").querySelectorAll("th.sort").forEach((th) => th.addEventListener("click", () => {
+      const k = th.dataset.k;
+      if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = k === "item" ? 1 : -1; }
+      render();
+    }));
+  }
+
+  function render() {
+    const q = $("q").value.trim().toLowerCase(), ev = $("f-event").value, end = $("f-end").value;
+    const min = Number($("f-min").value) || 0, vol = Number($("f-vol").value) || 0, only = $("f-star").checked;
+    let rows = latest.filter((r) =>
+      (!q || r.item.toLowerCase().includes(q)) && (!ev || r.event === ev) && (!end || r.end_date === end) &&
+      (r.yes_pct || 0) >= min && (r.volume_24h_usd || 0) >= vol && (!only || stars.has(r.item_id)));
+    rows.sort((a, b) => {
+      const x = a[sortKey], y = b[sortKey];
+      if (x == null && y == null) return 0;
+      if (x == null) return 1;
+      if (y == null) return -1;
+      return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
+    });
+    head();
+    $("count").textContent = rows.length + " of " + latest.length + " items";
+    $("t").querySelector("tbody").innerHTML = rows.map((r) =>
+      `<tr><td><button class="star${stars.has(r.item_id) ? " on" : ""}" data-id="${esc(r.item_id)}" aria-label="Star ${esc(r.item)}">${stars.has(r.item_id) ? "★" : "☆"}</button></td>` +
+      `<td class="name">${esc(r.item)}</td><td class="name">${esc(r.event)}</td><td>${esc(r.end_date)}</td>` +
+      cols.map(([k]) => `<td class="n">${k.includes("usd") ? RC.usd(r[k]) : k === "day_change_pts" ? changeCell(r[k]) : RC.num(r[k])}</td>`).join("") + "</tr>").join("");
+    $("t").querySelectorAll(".star").forEach((b) => b.addEventListener("click", () => {
+      const on = Shortlist.toggle(b.dataset.id);
+      on ? stars.add(b.dataset.id) : stars.delete(b.dataset.id);
+      render();
+    }));
+  }
+
+  try {
+    const { rows } = await loadData();
+    const date = RC.dates(rows).pop();
+    latest = RC.onDate(rows, date);
+    $("info").textContent = "Latest values from " + date + ". Star an item to keep it on your shortlist (saved in this browser).";
+    const opts = (id, label, vals) => { $(id).innerHTML = `<option value="">${label}</option>` + vals.map((v) => `<option>${esc(v)}</option>`).join(""); };
+    opts("f-event", "All events", [...new Set(latest.map((r) => r.event))].sort());
+    opts("f-end", "Any date", [...new Set(latest.map((r) => r.end_date))].sort());
+    ["q", "f-event", "f-end", "f-min", "f-vol", "f-star"].forEach((id) => $(id).addEventListener("input", render));
+    $("reset").addEventListener("click", () => {
+      $("q").value = ""; $("f-event").value = ""; $("f-end").value = ""; $("f-min").value = ""; $("f-vol").value = ""; $("f-star").checked = false; render();
+    });
+    render();
+  } catch (e) {
+    $("info").textContent = "";
+    $("error").textContent = "Could not load the data: " + e.message;
+  }
+})();
+</script>
+</body>
+</html>

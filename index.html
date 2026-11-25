@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odds Tracker – Today</title>
+<meta name="description" content="Daily snapshot of Polymarket prediction-market odds and what moved.">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main>
+  <h1>Today</h1>
+  <p class="lede" id="runinfo">Loading…</p>
+  <div id="error" class="error"></div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>Sources</h2>
+  <div class="table-wrap"><table id="sources"><thead><tr><th>Source</th><th>Status</th><th class="n">Markets returned</th></tr></thead><tbody></tbody></table></div>
+
+  <h2>Biggest moves since the previous run</h2>
+  <div class="panel"><ul class="moves" id="moves"></ul><p class="how" id="movesnote"></p></div>
+
+  <h2>Latest values</h2>
+  <div class="table-wrap"><table id="latest"><thead><tr>
+    <th>Item</th><th class="n">Yes %</th><th class="n">Change (pts)</th><th class="n">24h volume</th><th class="n">Liquidity</th><th>Closes</th>
+  </tr></thead><tbody></tbody></table></div>
+</main>
+<script src="lib.js"></script>
+<script src="app.js"></script>
+<script>
+(async function () {
+  try {
+    const { rows, status } = await loadData();
+    const c = RC.compareLatest(rows);
+    document.getElementById("runinfo").textContent =
+      "Last run: " + status.run_time.replace("T", " ").replace("Z", " UTC") +
+      (c.prevDate ? " · compared with " + c.prevDate : " · first run, nothing to compare with yet");
+
+    const names = new Map(rows.map((r) => [r.item_id, r.item]));
+    const list = (ids) => (ids.length ? ids.length : 0);
+    document.getElementById("cards").innerHTML = [
+      ["Items", status.items], ["Days with data", status.days_with_success], ["First run", status.first_run_date],
+      ["New today", list(status.new_today)], ["Gone today", list(status.gone_today)],
+    ].map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`).join("");
+
+    document.querySelector("#sources tbody").innerHTML = status.sources.map((s) =>
+      `<tr><td>${esc(s.name)}</td><td><span class="dot${s.ok ? "" : " bad"}"></span>${s.ok ? "ok" : "failed"}</td><td class="n">${s.count}</td></tr>`).join("");
+
+    const mv = document.getElementById("moves");
+    if (!c.prevDate) mv.innerHTML = '<li class="muted">Moves appear after the second day of data.</li>';
+    else if (!c.moves.length) mv.innerHTML = '<li class="muted">No item changed since the previous run.</li>';
+    else mv.innerHTML = c.moves.map((m) =>
+      `<li><span>${esc(m.item)}</span><span>${RC.num(m.old)}% → ${RC.num(m.new)}% &nbsp; ${changeCell(m.delta)} pts</span></li>`).join("");
+    const extra = [];
+    if (c.appeared.length) extra.push("Appeared: " + c.appeared.map((i) => names.get(i)).join(", "));
+    if (c.disappeared.length) extra.push("Disappeared: " + c.disappeared.map((i) => names.get(i)).join(", "));
+    document.getElementById("movesnote").textContent =
+      "Rule: change in Yes probability (percentage points) since the previous run, ranked by size, top " + RC.TOP_N + "." + (extra.length ? " " + extra.join(". ") + "." : "");
+
+    document.querySelector("#latest tbody").innerHTML = [...c.cur.values()].sort((a, b) => (b.volume_24h_usd || 0) - (a.volume_24h_usd || 0)).map((r) =>
+      `<tr><td class="name">${esc(r.item)}</td><td class="n">${RC.num(r.yes_pct)}</td><td class="n">${changeCell(c.changes.get(r.item_id))}</td>` +
+      `<td class="n">${RC.usd(r.volume_24h_usd)}</td><td class="n">${RC.usd(r.liquidity_usd)}</td><td>${esc(r.end_date)}</td></tr>`).join("");
+  } catch (e) {
+    document.getElementById("runinfo").textContent = "";
+    document.getElementById("error").textContent = "Could not load the data: " + e.message;
+  }
+})();
+</script>
+</body>
+</html>
