@@ -1,5 +1,5 @@
 /* Service worker: the app shell is cached on install; data files are network-first with a saved copy as fallback. */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `odds-shell-${VERSION}`;
 const DATA = `odds-data-${VERSION}`;
 const SHELL_FILES = [

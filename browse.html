@@ -14,8 +14,8 @@
 <body>
 <div id="nav"></div>
 <main>
-  <h1>Browse</h1>
-  <p class="lede" id="info">Loading…</p>
+  <div class="hero"><h1>Browse</h1>
+  <p class="lede" id="info">Loading…</p></div>
   <div id="error" class="error"></div>
 
   <div class="controls">
@@ -37,13 +37,13 @@
 <script>
 (async function () {
   const $ = (id) => document.getElementById(id);
-  let latest = [], sortKey = "volume_24h_usd", sortDir = -1;
+  let latest = [], series = new Map(), sortKey = "volume_24h_usd", sortDir = -1;
   const stars = Shortlist.get();
   const cols = [["yes_pct", "Yes %"], ["day_change_pts", "24h chg"], ["best_bid_pct", "Bid %"], ["best_ask_pct", "Ask %"],
                 ["volume_24h_usd", "24h vol"], ["volume_total_usd", "Total vol"], ["liquidity_usd", "Liquidity"]];
 
   function head() {
-    $("head").innerHTML = '<th></th><th class="sort" data-k="item">Item</th><th>Category</th><th>Closes</th>' +
+    $("head").innerHTML = '<th></th><th class="sort" data-k="item">Item</th><th>Category</th><th>Trend</th><th>Closes</th>' +
       cols.map(([k, t]) => `<th class="sort n" data-k="${k}">${t}${sortKey === k ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("");
     $("head").querySelectorAll("th.sort").forEach((th) => th.addEventListener("click", () => {
       const k = th.dataset.k;
@@ -69,8 +69,8 @@
     $("count").textContent = rows.length + " of " + latest.length + " items";
     $("t").querySelector("tbody").innerHTML = rows.map((r) =>
       `<tr><td><button class="star${stars.has(r.item_id) ? " on" : ""}" data-id="${esc(r.item_id)}" aria-label="Star ${esc(r.item)}">${stars.has(r.item_id) ? "★" : "☆"}</button></td>` +
-      `<td class="name">${esc(r.item)}</td><td>${esc(r.category)}</td><td>${esc(r.end_date)}</td>` +
-      cols.map(([k]) => `<td class="n">${k.includes("usd") ? RC.usd(r[k]) : k === "day_change_pts" ? changeCell(r[k]) : RC.num(r[k])}</td>`).join("") + "</tr>").join("");
+      `<td class="name">${esc(r.item)}</td><td>${catChip(r.category)}</td><td>${spark(series.get(r.item_id))}</td><td>${esc(r.end_date)}</td>` +
+      cols.map(([k]) => `<td class="n">${k === "yes_pct" ? probBar(r[k]) : k.includes("usd") ? RC.usd(r[k]) : k === "day_change_pts" ? changeCell(r[k]) : RC.num(r[k])}</td>`).join("") + "</tr>").join("");
     $("t").querySelectorAll(".star").forEach((b) => b.addEventListener("click", () => {
       const on = Shortlist.toggle(b.dataset.id);
       on ? stars.add(b.dataset.id) : stars.delete(b.dataset.id);
@@ -82,6 +82,7 @@
     const { rows } = await loadData();
     const date = RC.dates(rows).pop();
     latest = RC.onDate(rows, date);
+    series = RC.seriesById(rows);
     $("info").textContent = "Latest values from " + date + ". Star an item to keep it on your shortlist (saved in this browser).";
     const opts = (id, label, vals) => { $(id).innerHTML = `<option value="">${label}</option>` + vals.map((v) => `<option>${esc(v)}</option>`).join(""); };
     opts("f-cat", "All categories", [...new Set(latest.map((r) => r.category))].sort());

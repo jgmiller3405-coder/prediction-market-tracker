@@ -14,22 +14,25 @@
 <body>
 <div id="nav"></div>
 <main>
-  <h1>Today</h1>
-  <p class="lede" id="runinfo">Loading…</p>
+  <div class="hero">
+    <h1>Today</h1>
+    <p class="lede" id="runinfo">Loading…</p>
+  </div>
   <div id="error" class="error"></div>
 
   <div class="cards" id="cards"></div>
-
-  <h2>Sources</h2>
-  <div class="table-wrap"><table id="sources"><thead><tr><th>Source</th><th>Status</th><th class="n">Markets returned</th></tr></thead><tbody></tbody></table></div>
 
   <h2>Biggest moves since the previous run</h2>
   <div class="panel"><ul class="moves" id="moves"></ul><p class="how" id="movesnote"></p></div>
 
   <h2>Latest values</h2>
   <div class="table-wrap"><table id="latest"><thead><tr>
-    <th>Item</th><th class="n">Yes %</th><th class="n">Change (pts)</th><th class="n">24h volume</th><th class="n">Liquidity</th><th>Closes</th>
+    <th>Item</th><th>Category</th><th class="n">Yes %</th><th class="n">Change (pts)</th><th>Trend</th><th class="n">24h volume</th><th class="n">Liquidity</th><th>Closes</th>
   </tr></thead><tbody></tbody></table></div>
+
+  <h2>Run status</h2>
+  <p class="muted" id="counts"></p>
+  <div class="table-wrap"><table id="sources"><thead><tr><th>Source</th><th>Status</th><th class="n">Markets returned</th></tr></thead><tbody></tbody></table></div>
 </main>
 <script src="lib.js"></script>
 <script src="app.js"></script>
@@ -38,34 +41,45 @@
   try {
     const { rows, status } = await loadData();
     const c = RC.compareLatest(rows);
+    const series = RC.seriesById(rows);
     document.getElementById("runinfo").textContent =
       "Last run: " + status.run_time.replace("T", " ").replace("Z", " UTC") +
-      (c.prevDate ? " · compared with " + c.prevDate : " · first run, nothing to compare with yet");
+      (c.prevDate ? " · change measured against " + c.prevDate : " · first run: changes start showing from the second day");
 
     const names = new Map(rows.map((r) => [r.item_id, r.item]));
-    const list = (ids) => (ids.length ? ids.length : 0);
-    document.getElementById("cards").innerHTML = [
-      ["Items", status.items], ["Days with data", status.days_with_success], ["First run", status.first_run_date],
-      ["New today", list(status.new_today)], ["Gone today", list(status.gone_today)],
-    ].map(([k, v]) => `<div class="card"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`).join("");
-
-    document.querySelector("#sources tbody").innerHTML = status.sources.map((s) =>
-      `<tr><td>${esc(s.name)}</td><td><span class="dot${s.ok ? "" : " bad"}"></span>${s.ok ? "ok" : "failed"}</td><td class="n">${s.count}</td></tr>`).join("");
+    const deltas = [...c.changes.values()];
+    const up = deltas.filter((d) => d > 0).length, down = deltas.filter((d) => d < 0).length;
+    const flat = deltas.length - up - down;
+    const top = c.moves[0];
+    const card = (k, v, sub = "") => `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="sub">${sub}</div></div>`;
+    document.getElementById("cards").innerHTML = c.prevDate
+      ? card("Biggest move", top ? changeCell(top.delta) + " pts" : "None", top ? esc(top.item) : "nothing changed") +
+        card("Rose", `<span class="up">▲ ${up}</span>`, "items up since last run") +
+        card("Fell", `<span class="down">▼ ${down}</span>`, "items down since last run") +
+        card("Unchanged", flat, "items") +
+        card("Days of data", status.days_with_success, "since " + status.first_run_date)
+      : card("Items tracked", status.items, "across " + status.sources.length + " markets") +
+        card("Days of data", status.days_with_success, "since " + status.first_run_date) +
+        card("Next", "Day 2", "moves appear after the next run");
 
     const mv = document.getElementById("moves");
     if (!c.prevDate) mv.innerHTML = '<li class="muted">Moves appear after the second day of data.</li>';
     else if (!c.moves.length) mv.innerHTML = '<li class="muted">No item changed since the previous run.</li>';
     else mv.innerHTML = c.moves.map((m) =>
       `<li><span>${esc(m.item)}</span><span>${RC.num(m.old)}% → ${RC.num(m.new)}% &nbsp; ${changeCell(m.delta)} pts</span></li>`).join("");
-    const extra = [];
-    if (c.appeared.length) extra.push("Appeared: " + c.appeared.map((i) => names.get(i)).join(", "));
-    if (c.disappeared.length) extra.push("Disappeared: " + c.disappeared.map((i) => names.get(i)).join(", "));
     document.getElementById("movesnote").textContent =
-      "Rule: change in Yes probability (percentage points) since the previous run, ranked by size, top " + RC.TOP_N + "." + (extra.length ? " " + extra.join(". ") + "." : "");
+      "Rule: change in Yes probability (percentage points) since the previous run, ranked by size, top " + RC.TOP_N + ".";
 
     document.querySelector("#latest tbody").innerHTML = [...c.cur.values()].sort((a, b) => (b.volume_24h_usd || 0) - (a.volume_24h_usd || 0)).map((r) =>
-      `<tr><td class="name">${esc(r.item)}</td><td class="n">${RC.num(r.yes_pct)}</td><td class="n">${changeCell(c.changes.get(r.item_id))}</td>` +
-      `<td class="n">${RC.usd(r.volume_24h_usd)}</td><td class="n">${RC.usd(r.liquidity_usd)}</td><td>${esc(r.end_date)}</td></tr>`).join("");
+      `<tr><td class="name">${esc(r.item)}</td><td>${catChip(r.category)}</td><td class="n">${probBar(r.yes_pct)}</td><td class="n">${changeCell(c.changes.get(r.item_id))}</td>` +
+      `<td>${spark(series.get(r.item_id))}</td><td class="n">${RC.usd(r.volume_24h_usd)}</td><td class="n">${RC.usd(r.liquidity_usd)}</td><td>${esc(r.end_date)}</td></tr>`).join("");
+
+    // run status: sources, plus the item counts from status.json (kept small: they only change when a source fails or a market closes)
+    const list = (ids) => (ids.length ? ids.map((i) => names.get(i) || i).join(", ") : "");
+    document.getElementById("counts").textContent =
+      `Items in this run: ${status.items} · New today: ${status.new_today.length}${list(status.new_today) ? " (" + list(status.new_today) + ")" : ""} · Gone today: ${status.gone_today.length}${list(status.gone_today) ? " (" + list(status.gone_today) + ")" : ""}`;
+    document.querySelector("#sources tbody").innerHTML = status.sources.map((s) =>
+      `<tr><td>${esc(s.name)}</td><td><span class="dot${s.ok ? "" : " bad"}"></span>${s.ok ? "ok" : "failed"}</td><td class="n">${s.count}</td></tr>`).join("");
   } catch (e) {
     document.getElementById("runinfo").textContent = "";
     document.getElementById("error").textContent = "Could not load the data: " + e.message;

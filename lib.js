@@ -78,6 +78,17 @@
     };
   }
 
+  // item_id -> list of yes_pct values in date order (for sparklines)
+  function seriesById(rows) {
+    const m = new Map();
+    for (const r of [...rows].sort((a, b) => (a.date < b.date ? -1 : 1))) {
+      if (r.yes_pct == null) continue;
+      if (!m.has(r.item_id)) m.set(r.item_id, []);
+      m.get(r.item_id).push(r.yes_pct);
+    }
+    return m;
+  }
+
   /* ---------- statistics for the Trends page ---------- */
   const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
   const stdev = (a) => (a.length < 2 ? 0 : Math.sqrt(a.reduce((s, x) => s + (x - mean(a)) ** 2, 0) / (a.length - 1)));
@@ -157,7 +168,7 @@
   const usd = (x) => (x == null ? "–" : "$" + Number(x).toLocaleString("en-US", { maximumFractionDigits: 0 }));
   const signed = (x, d = 2) => (x == null ? "–" : (x > 0 ? "+" : "") + Number(x).toFixed(d));
 
-  const api = { NUMERIC, TOP_N, parseCSV, dates, onDate, indexById, compareLatest, sinceFirst, dailyMoves,
+  const api = { NUMERIC, TOP_N, parseCSV, dates, onDate, indexById, compareLatest, seriesById, sinceFirst, dailyMoves,
     spreadOn, volumeByEvent, volatility, mean, stdev, num, usd, signed };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.RC = api;

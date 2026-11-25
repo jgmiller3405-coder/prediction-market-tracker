@@ -58,3 +58,27 @@ ul.moves li { padding: 7px 0; border-bottom: 1px solid var(--line); display: fle
 ul.moves li:last-child { border-bottom: 0; }
 .error { color: var(--down); }
 @media (max-width: 600px) { h1 { font-size: 21px; } .card .v { font-size: 20px; } }
+
+/* ---------- prediction-market look ---------- */
+.hero { background: linear-gradient(135deg, #0a1a40 0%, #1e4fd8 62%, #3b82f6 100%); color: #fff; border-radius: 14px; padding: 22px 24px; margin: 0 0 18px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.18), transparent 70%); }
+.hero h1 { color: #fff; margin: 0 0 4px; }
+.hero .lede, .hero p { color: rgba(255,255,255,.82); margin: 0; position: relative; }
+.card { position: relative; overflow: hidden; }
+.card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+.card .sub { font-size: 12px; color: var(--muted); min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prob { display: inline-flex; align-items: center; gap: 8px; min-width: 150px; justify-content: flex-end; }
+.prob .track { flex: 1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--down) 28%, transparent); overflow: hidden; min-width: 60px; }
+.prob .fill { display: block; height: 100%; border-radius: 4px; background: var(--up); }
+.prob b { min-width: 52px; text-align: right; font-variant-numeric: tabular-nums; }
+.chip { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+.chip.fin { color: var(--s3); background: color-mix(in srgb, var(--s3) 14%, transparent); }
+.chip.pop { color: var(--s4); background: color-mix(in srgb, var(--s4) 14%, transparent); }
+.chip.pol { color: var(--s1); background: color-mix(in srgb, var(--s1) 14%, transparent); }
+.chip.spt { color: var(--s2); background: color-mix(in srgb, var(--s2) 16%, transparent); }
+.spark { vertical-align: middle; }
+.spark.up { stroke: var(--up); fill: var(--up); }
+.spark.down { stroke: var(--down); fill: var(--down); }
+.spark.flat { stroke: var(--muted); fill: var(--muted); }
+tbody tr:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.foot { max-width: 1100px; margin: 0 auto; padding: 0 16px 32px; font-size: 12px; color: var(--muted); text-align: center; }
