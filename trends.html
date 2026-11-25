@@ -31,6 +31,16 @@
   </div>
 
   <div id="sections"></div>
+
+  <h2>Daily tracker</h2>
+  <div class="panel">
+    <p class="how">The value of every item on each day the pipeline ran, exactly as recorded in the history file. One line per item, one point per day; hover a point to see which item it is.</p>
+    <div class="controls">
+      <label>Category<select id="trk-cat"></select></label>
+      <label>Value<select id="trk-val"></select></label>
+    </div>
+    <div class="chart-box" style="height:380px"><canvas id="tracker"></canvas></div>
+  </div>
 </main>
 <script src="vendor/chart.umd.js?v=3"></script>
 <script src="lib.js?v=3"></script>
@@ -143,6 +153,29 @@
          <p class="how">How it is computed: for each item, the sample standard deviation of (yes_pct on a day − yes_pct on the previous day) over all days in data/history.csv.</p>`);
       draw("c5", bar(vol.slice(0, 8).map((v) => short(v.item, 28)), vol.slice(0, 8).map((v) => v.sd), p.accent, true, "st. dev. of daily change (pts)"));
     }
+
+    // ----- daily tracker: the recorded values, no calculations
+    const catColor = { Political: p.series[0], Sports: p.series[1], Financial: p.series[2], "Pop culture": p.series[3] };
+    const trkCats = [...new Set(items.map((i) => i.category))].sort();
+    $("trk-cat").innerHTML = '<option value="">All categories</option>' + trkCats.map((c) => `<option>${esc(c)}</option>`).join("");
+    $("trk-val").innerHTML = RC.NUMERIC.map((n) => `<option value="${n.key}">${n.label}</option>`).join("");
+    const trackerChart = () => {
+      const cat = $("trk-cat").value, key = $("trk-val").value, meta = RC.NUMERIC.find((n) => n.key === key);
+      const byKey = new Map(rows.map((r) => [r.date + "|" + r.item_id, r]));
+      const sets = items.filter((it) => !cat || it.category === cat).map((it) => {
+        const color = catColor[it.category] || p.accent;
+        return { label: it.item, borderColor: color, backgroundColor: color, borderWidth: 1.5, pointRadius: 3, tension: 0, spanGaps: false,
+          data: ds.map((d) => { const r = byKey.get(d + "|" + it.item_id); return r ? r[key] : null; }) };
+      });
+      draw("tracker", { type: "line", data: { labels: ds, datasets: sets },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "nearest", intersect: true },
+          scales: { x: { title: { display: true, text: "run date (UTC)" } }, y: { title: { display: true, text: meta.label + " (" + meta.unit + ")" } } },
+          plugins: { legend: { display: false },
+            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y == null ? "no data" : RC.num(c.parsed.y, meta.digits)}` } } } } });
+    };
+    $("trk-cat").addEventListener("change", trackerChart);
+    $("trk-val").addEventListener("change", trackerChart);
+    trackerChart();
   } catch (e) {
     $("info").textContent = "";
     $("error").textContent = "Could not load the data: " + e.message;
