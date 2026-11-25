@@ -1,5 +1,5 @@
 /* Service worker: the app shell is cached on install; data files are network-first with a saved copy as fallback. */
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `odds-shell-${VERSION}`;
 const DATA = `odds-data-${VERSION}`;
 const SHELL_FILES = [
@@ -8,7 +8,7 @@ const SHELL_FILES = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(SHELL).then((c) => Promise.all(SHELL_FILES.map((f) => c.add(new Request(f, { cache: "reload" }))))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -27,7 +27,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.includes("/data/")) {
     // online: take the network answer and keep a copy; offline: the last copy
     event.respondWith(
-      fetch(req).then((res) => {
+      fetch(req, { cache: "no-cache" }).then((res) => {
         if (res.ok) { const copy = res.clone(); caches.open(DATA).then((c) => c.put(req, copy)); }
         return res;
       }).catch(() => caches.match(req, { ignoreSearch: true }))
@@ -37,7 +37,7 @@ self.addEventListener("fetch", (event) => {
 
   // pages and assets: network first so a new deploy shows up, saved copy when offline
   event.respondWith(
-    fetch(req).then((res) => {
+    fetch(req, { cache: "no-cache" }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(SHELL).then((c) => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match("index.html")))
