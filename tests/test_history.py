@@ -68,7 +68,7 @@ def test_a_second_run_on_the_same_day_replaces_that_days_data(tmp_path, good_fet
     run_fetch(tmp_path, D1, good_fetcher)
     build_history(tmp_path)
     good_fetcher.state["yes"] = 0.7
-    good_fetcher.state["fail"].add("polymarket_netanyahu")
+    good_fetcher.state["fail"].add("polymarket_epl_relegation")
     run_fetch(tmp_path, D1, good_fetcher)
     rows = build_history(tmp_path)
     assert len({r["date"] for r in rows}) == 1                     # still one day
@@ -82,7 +82,7 @@ def test_a_second_run_on_the_same_day_replaces_that_days_data(tmp_path, good_fet
 def test_status_file_keys_and_counts(tmp_path, good_fetcher):
     run_fetch(tmp_path, D1, good_fetcher)
     build_history(tmp_path)
-    good_fetcher.state["fail"].add("polymarket_anthropic")
+    good_fetcher.state["fail"].add("polymarket_google_searches")
     run_fetch(tmp_path, D2, good_fetcher)
     build_history(tmp_path)
     status = write_status(tmp_path, datetime(2026, 11, 26, 6, 0, tzinfo=timezone.utc))
@@ -92,7 +92,7 @@ def test_status_file_keys_and_counts(tmp_path, good_fetcher):
     assert status["new_today"] == [] and len(status["gone_today"]) == 5
     by_name = {s["name"]: s for s in status["sources"]}
     assert len(by_name) == len(EVENTS)
-    assert by_name["polymarket_anthropic"] == {"name": "polymarket_anthropic", "ok": False, "count": 0}
+    assert by_name["polymarket_google_searches"] == {"name": "polymarket_google_searches", "ok": False, "count": 0}
     assert by_name["polymarket_bitcoin"]["ok"] is True and by_name["polymarket_bitcoin"]["count"] == 5
     assert json.loads((tmp_path / "data" / "status.json").read_text()) == status
 
@@ -106,13 +106,13 @@ def test_days_with_success_counts_dates_not_runs(tmp_path, good_fetcher):
 def test_issue_lists_moves_and_disappeared_items(tmp_path, good_fetcher):
     run_fetch(tmp_path, D1, good_fetcher)
     good_fetcher.state["yes"] = 0.6
-    good_fetcher.state["fail"].add("polymarket_netanyahu")
+    good_fetcher.state["fail"].add("polymarket_epl_relegation")
     run_fetch(tmp_path, D2, good_fetcher)
     build_history(tmp_path)
     title, body = build_issue(load_history(tmp_path / "data" / "history.csv"), D2)
     assert title == D2
     assert "+10.00" in body and "50.00" in body and "60.00" in body
-    assert "Disappeared" in body and "Netanyahu out" in body
+    assert "Disappeared" in body and "EPL relegation" in body
 
 
 def test_issue_is_written_even_on_a_day_with_no_changes(tmp_path, good_fetcher):

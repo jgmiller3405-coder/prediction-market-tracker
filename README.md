@@ -3,7 +3,7 @@
 [![tests](https://github.com/jgmiller3405-coder/prediction-market-tracker/actions/workflows/tests.yml/badge.svg)](https://github.com/jgmiller3405-coder/prediction-market-tracker/actions/workflows/tests.yml)
 [![daily](https://github.com/jgmiller3405-coder/prediction-market-tracker/actions/workflows/daily.yml/badge.svg)](https://github.com/jgmiller3405-coder/prediction-market-tracker/actions/workflows/daily.yml)
 
-Every day, on its own, this tool downloads the latest odds for 23 outcomes in 5 volatile
+Every day, on its own, this tool downloads the latest odds for 25 outcomes in 5 volatile
 [Polymarket](https://polymarket.com) prediction markets, adds them to a history (one row per item per day),
 reports what moved in a GitHub Issue, and publishes the result as an installable website.
 
@@ -12,17 +12,18 @@ reports what moved in a GitHub Issue, and publishes the result as an installable
 
 ## What is tracked
 
-Five multi-outcome markets were chosen on 2026-11-25 because their outcomes had large one-day price swings
-and every tracked outcome closes after 2026-12-03 (the earliest is 2026-12-15). Each outcome is one **item**
-(23 in all). The item key is Polymarket's numeric market id, which does not change from day to day.
+Five multi-outcome markets were chosen on 2026-11-25: one financial, one pop culture, one political and two
+sports. Their outcomes had large one-day price swings and every tracked outcome closes after 2026-12-03
+(the earliest is 2026-12-15). Each outcome is one **item** (25 in all). The item key is Polymarket's numeric
+market id, which does not change from day to day.
 
-| Source name | Polymarket event | Items |
-|---|---|---|
-| `polymarket_bitcoin` | What price will Bitcoin hit in 2026? | 5 |
-| `polymarket_anthropic` | Will Anthropic's valuation hit __ by December 31? | 5 |
-| `polymarket_google_searches` | Top 5 Most Searched People on Google 2026 | 5 |
-| `polymarket_iran_blockade` | US announces end of Iranian blockade by...? | 5 |
-| `polymarket_netanyahu` | Netanyahu out by...? | 3 |
+| Source name | Category | Polymarket event | Items |
+|---|---|---|---|
+| `polymarket_bitcoin` | Financial | What price will Bitcoin hit in 2026? | 5 |
+| `polymarket_google_searches` | Pop culture | Top 5 Most Searched People on Google 2026 | 5 |
+| `polymarket_iran_blockade` | Political | US announces end of Iranian blockade by...? | 5 |
+| `polymarket_nhl_playoffs` | Sports | Which teams will make the NHL Playoffs? | 5 |
+| `polymarket_epl_relegation` | Sports | Premier League: Teams relegated (2026-27) | 5 |
 
 The list of ids lives in `tracker/markets.py`. To track something else, edit it there.
 
@@ -41,7 +42,7 @@ attempts), it writes no raw file that day, is recorded as failed, and the other 
 | Path | What it does |
 |---|---|
 | `pipeline.py` | Command line: `fetch`, `build`, `status`, `issue`, `daily` |
-| `tracker/markets.py` | The 5 events and 23 market ids that are tracked |
+| `tracker/markets.py` | The 5 events (with their category) and 25 market ids that are tracked |
 | `tracker/fetch.py` | Downloads each source, saves the raw file, records every source result in `data/source_log.csv` |
 | `tracker/rawstore.py` | Writes and reads the gzipped raw files |
 | `tracker/convert.py` | Converts a raw response into rows with the common columns |
@@ -73,6 +74,7 @@ The rows are sorted by `date`, then `item_id`. A value the source does not repor
 | `item_id` | Polymarket market id (the key) | text |
 | `item` | Item name: short event name plus the outcome | text |
 | `source` | The source (raw file name) the row came from | text |
+| `category` | Kind of market: Financial, Pop culture, Political or Sports | text |
 | `event` | Full title of the Polymarket event | text |
 | `end_date` | Date the market is scheduled to close | `YYYY-MM-DD` |
 | `closed` | `true` once Polymarket marks the market closed | true/false |
@@ -131,7 +133,7 @@ there. Online, the pages fetch the data files from the network; offline, the ser
 copy it saved. The site can be installed from the browser as an app.
 
 - **Today**: time of the last run, status of every source, counts, latest values with change since the previous run, biggest moves.
-- **Browse**: filters (event, close date, minimum Yes %, minimum 24h volume), name search, sort by every numeric column, and a star that saves an item to a shortlist in the browser.
+- **Browse**: filters (category, event, close date, minimum Yes %, minimum 24h volume), name search, sort by every numeric column, and a star that saves an item to a shortlist in the browser.
 - **Trends**: a chart of every numeric value with an item picker, and five findings with explanation, numbers and chart.
 
 ## GitHub setup

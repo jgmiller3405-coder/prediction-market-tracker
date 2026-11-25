@@ -1,18 +1,18 @@
 {
-  "run_time": "2026-11-25T19:23:59Z",
+  "run_time": "2026-11-25T19:37:10Z",
   "first_run_date": "2026-11-25",
   "days_with_success": 1,
-  "items": 23,
+  "items": 25,
   "new_today": [],
   "gone_today": [],
   "sources": [
     {
-      "name": "polymarket_anthropic",
+      "name": "polymarket_bitcoin",
       "ok": true,
       "count": 5
     },
     {
-      "name": "polymarket_bitcoin",
+      "name": "polymarket_epl_relegation",
       "ok": true,
       "count": 5
     },
@@ -27,9 +27,9 @@
       "count": 5
     },
     {
-      "name": "polymarket_netanyahu",
+      "name": "polymarket_nhl_playoffs",
       "ok": true,
-      "count": 3
+      "count": 5
     }
   ]
 }

@@ -5,7 +5,7 @@ from .markets import Event
 
 COLUMNS = [
     "date", "item_id", "item", "source",        # fixed first four
-    "event", "end_date", "closed",              # text columns
+    "category", "event", "end_date", "closed",  # text columns
     "yes_pct", "best_bid_pct", "best_ask_pct",  # odds, in percent
     "day_change_pts",                           # change in yes_pct over 24 h
     "volume_24h_usd", "volume_total_usd", "liquidity_usd",
@@ -58,6 +58,7 @@ def convert_markets(event: Event, source: str, date: str, raw: bytes) -> list:
             "item_id": market_id,
             "item": f"{event.short}: {_label(market)}",
             "source": source,
+            "category": event.category,
             "event": event.title,
             "end_date": (market.get("endDate") or "")[:10],
             "closed": "true" if market.get("closed") else "false",
