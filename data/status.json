@@ -1,0 +1,35 @@
+{
+  "run_time": "2026-11-25T19:18:02Z",
+  "first_run_date": "2026-11-25",
+  "days_with_success": 1,
+  "items": 23,
+  "new_today": [],
+  "gone_today": [],
+  "sources": [
+    {
+      "name": "polymarket_anthropic",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "polymarket_bitcoin",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "polymarket_google_searches",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "polymarket_iran_blockade",
+      "ok": true,
+      "count": 5
+    },
+    {
+      "name": "polymarket_netanyahu",
+      "ok": true,
+      "count": 3
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+date,item_id,item,source,event,end_date,closed,yes_pct,best_bid_pct,best_ask_pct,day_change_pts,volume_24h_usd,volume_total_usd,liquidity_usd
+2026-11-25,1339767,"Bitcoin 2026: Dip 50,000",polymarket_bitcoin,What price will Bitcoin hit in 2026?,2027-01-01,false,32.5,32.2,32.8,0.4,130310,7173307,119270
+2026-11-25,1339768,"Bitcoin 2026: Dip 40,000",polymarket_bitcoin,What price will Bitcoin hit in 2026?,2027-01-01,false,9.3,9.2,9.4,-0.65,41559,3569375,135365
+2026-11-25,1345531,"Bitcoin 2026: Hit 90,000",polymarket_bitcoin,What price will Bitcoin hit in 2026?,2027-01-01,false,3.45,3.4,3.5,0.5,51417,3799005,118155
+2026-11-25,2299954,Anthropic valuation: Hit$2.0T,polymarket_anthropic,Will Anthropic's valuation hit __ by December 31?,2027-01-05,false,6.5,6.0,7.0,-2.0,16354,1447889,72895
+2026-11-25,2299955,Anthropic valuation: Hit$1.75T,polymarket_anthropic,Will Anthropic's valuation hit __ by December 31?,2027-01-05,false,14.0,13.0,15.0,-2.5,18762,1795696,55305
+2026-11-25,2299960,Anthropic valuation: Dip$800B,polymarket_anthropic,Will Anthropic's valuation hit __ by December 31?,2027-01-05,false,34.1,33.2,35.0,7.0,21269,344134,24784
+2026-11-25,2299962,Anthropic valuation: Dip$600B,polymarket_anthropic,Will Anthropic's valuation hit __ by December 31?,2027-01-05,false,8.25,7.1,9.4,2.8,6395,104661,38286
+2026-11-25,3128886,Iran blockade ends: December 31,polymarket_iran_blockade,US announces end of Iranian blockade by...?,2027-01-01,false,14.9,14.8,15.0,-0.2,75819,7087919,147431
+2026-11-25,4425380,Top-5 Google searched 2026: Lindsay Clancy,polymarket_google_searches,Top 5 Most Searched People on Google 2026,2026-12-31,false,77.0,76.0,78.0,-2.5,2074,21576,3850
+2026-11-25,4425383,Top-5 Google searched 2026: Erling Haaland,polymarket_google_searches,Top 5 Most Searched People on Google 2026,2026-12-31,false,46.5,46.0,47.0,3.0,16718,65941,18997
+2026-11-25,4425386,Top-5 Google searched 2026: Bad Bunny,polymarket_google_searches,Top 5 Most Searched People on Google 2026,2026-12-31,false,45.0,44.0,46.0,9.5,16431,51505,15982
+2026-11-25,4906129,Iran blockade ends: March 31,polymarket_iran_blockade,US announces end of Iranian blockade by...?,2027-04-01,false,50.5,50.0,51.0,2.0,13091,937459,108869
+2026-11-25,567688,Netanyahu out: December 31,polymarket_netanyahu,Netanyahu out by...?,2027-01-01,false,60.5,60.0,61.0,11.0,51144,3580174,58779
+2026-11-25,6254929,"Netanyahu out: March 31, 2027",polymarket_netanyahu,Netanyahu out by...?,2027-04-01,false,65.5,65.0,66.0,3.0,8470,57861,48686
+2026-11-25,6254930,"Netanyahu out: June 30, 2027",polymarket_netanyahu,Netanyahu out by...?,2027-07-01,false,81.0,80.0,82.0,11.5,8392,233098,62618
+2026-11-25,6907990,Iran blockade ends: December 15,polymarket_iran_blockade,US announces end of Iranian blockade by...?,2026-12-16,false,9.0,8.0,10.0,-0.5,28916,214993,26046
+2026-11-25,6992350,Top-5 Google searched 2026: Jensen Huang,polymarket_google_searches,Top 5 Most Searched People on Google 2026,2027-01-01,false,59.0,58.0,60.0,-6.5,18208,56897,5102
+2026-11-25,701501,"Bitcoin 2026: Dip 55,000",polymarket_bitcoin,What price will Bitcoin hit in 2026?,2027-01-01,false,54.5,54.0,55.0,-4.0,94137,9667479,85836
+2026-11-25,701502,"Bitcoin 2026: Dip 45,000",polymarket_bitcoin,What price will Bitcoin hit in 2026?,2027-01-01,false,13.75,13.7,13.8,-0.7,121008,10938051,125282
+2026-11-25,7121266,Top-5 Google searched 2026: Lula da Silva,polymarket_google_searches,Top 5 Most Searched People on Google 2026,2027-01-01,false,28.5,27.0,30.0,,3558,11377,3664
+2026-11-25,7155711,Iran blockade ends: February 28,polymarket_iran_blockade,US announces end of Iranian blockade by...?,2027-03-01,false,33.5,33.0,34.0,-1.0,1420,26137,40838
+2026-11-25,7155713,Iran blockade ends: January 31,polymarket_iran_blockade,US announces end of Iranian blockade by...?,2027-02-01,false,22.5,22.0,23.0,-1.0,20645,74274,45189
+2026-11-25,7185169,Anthropic valuation: Dip$1.0T,polymarket_anthropic,Will Anthropic's valuation hit __ by December 31?,2027-01-05,false,98.3,97.2,99.4,14.3,144446,137912,138651
