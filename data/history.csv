@@ -49,3 +49,28 @@ date,item_id,item,source,category,event,end_date,closed,yes_pct,best_bid_pct,bes
 2026-11-26,7121266,Top-5 Google searched 2026: Lula da Silva,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2027-01-01,false,30.0,29.0,31.0,-2.0,3991,14719,8331
 2026-11-26,7155711,Iran blockade ends: February 28,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-03-01,false,33.5,33.0,34.0,1.0,1351,26451,41130
 2026-11-26,7155713,Iran blockade ends: January 31,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-02-01,false,21.5,21.0,22.0,,2001,76175,49155
+2026-11-27,1339767,"Bitcoin 2026: Dip 50,000",polymarket_bitcoin,Financial,What price will Bitcoin hit in 2026?,2027-01-01,false,29.15,29.1,29.2,0.7,88520,7396016,125525
+2026-11-27,1339768,"Bitcoin 2026: Dip 40,000",polymarket_bitcoin,Financial,What price will Bitcoin hit in 2026?,2027-01-01,false,8.05,8.0,8.1,-0.5,47889,3656996,124175
+2026-11-27,1345531,"Bitcoin 2026: Hit 90,000",polymarket_bitcoin,Financial,What price will Bitcoin hit in 2026?,2027-01-01,false,3.05,3.0,3.1,0.1,5573,3836089,129250
+2026-11-27,3128886,Iran blockade ends: December 31,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-01-01,false,14.25,14.2,14.3,0.3,19941,7114402,168576
+2026-11-27,3848377,EPL relegation: Fulham,polymarket_epl_relegation,Sports,Premier League: Teams relegated (2026-27),2027-07-01,false,11.0,10.0,12.0,0.5,,9579,6005
+2026-11-27,3848379,EPL relegation: Hull City,polymarket_epl_relegation,Sports,Premier League: Teams relegated (2026-27),2027-07-01,false,44.5,44.0,45.0,1.0,136.0,83273,12187
+2026-11-27,3848389,EPL relegation: Manchester City,polymarket_epl_relegation,Sports,Premier League: Teams relegated (2026-27),2027-07-01,false,49.45,46.6,52.3,-2.45,542.0,143491,6666
+2026-11-27,3848396,EPL relegation: Nottingham Forest,polymarket_epl_relegation,Sports,Premier League: Teams relegated (2026-27),2027-07-01,false,12.0,11.0,13.0,,,12884,7068
+2026-11-27,3848398,EPL relegation: Sunderland,polymarket_epl_relegation,Sports,Premier League: Teams relegated (2026-27),2027-07-01,false,26.0,24.0,28.0,1.0,,17205,4836
+2026-11-27,4425380,Top-5 Google searched 2026: Lindsay Clancy,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2026-12-31,false,81.5,81.0,82.0,1.0,853.0,22672,5729
+2026-11-27,4425383,Top-5 Google searched 2026: Erling Haaland,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2026-12-31,false,50.5,50.0,51.0,-1.0,3551,78117,15553
+2026-11-27,4425386,Top-5 Google searched 2026: Bad Bunny,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2026-12-31,false,41.0,40.0,42.0,-3.0,1497,58340,9063
+2026-11-27,4906129,Iran blockade ends: March 31,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-04-01,false,50.5,50.0,51.0,-1.5,12825,962065,138910
+2026-11-27,5084162,Makes NHL playoffs: Ottawa Senators,polymarket_nhl_playoffs,Sports,Which teams will make the NHL Playoffs?,2027-04-16,false,78.5,78.0,79.0,0.5,,13522,5470
+2026-11-27,5084163,Makes NHL playoffs: Philadelphia Flyers,polymarket_nhl_playoffs,Sports,Which teams will make the NHL Playoffs?,2027-04-16,false,12.5,11.0,14.0,-4.0,178.0,5159,6793
+2026-11-27,5084166,Makes NHL playoffs: Seattle Kraken,polymarket_nhl_playoffs,Sports,Which teams will make the NHL Playoffs?,2027-04-16,false,25.5,25.0,26.0,-4.0,129.0,5100,3707
+2026-11-27,5084167,Makes NHL playoffs: St. Louis Blues,polymarket_nhl_playoffs,Sports,Which teams will make the NHL Playoffs?,2027-04-16,false,48.5,48.0,49.0,,63.0,23875,4429
+2026-11-27,5084169,Makes NHL playoffs: Toronto Maple Leafs,polymarket_nhl_playoffs,Sports,Which teams will make the NHL Playoffs?,2027-04-16,false,14.5,14.0,15.0,-1.0,186.0,21986,6858
+2026-11-27,6907990,Iran blockade ends: December 15,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2026-12-16,false,8.5,8.0,9.0,-1.0,14322,234442,40939
+2026-11-27,6992350,Top-5 Google searched 2026: Jensen Huang,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2027-01-01,false,69.5,69.0,70.0,1.5,3911,64775,6573
+2026-11-27,701501,"Bitcoin 2026: Dip 55,000",polymarket_bitcoin,Financial,What price will Bitcoin hit in 2026?,2027-01-01,false,52.5,52.0,53.0,5.0,64206,9807831,89479
+2026-11-27,701502,"Bitcoin 2026: Dip 45,000",polymarket_bitcoin,Financial,What price will Bitcoin hit in 2026?,2027-01-01,false,12.95,12.9,13.0,-0.95,102769,11115865,274429
+2026-11-27,7121266,Top-5 Google searched 2026: Lula da Silva,polymarket_google_searches,Pop culture,Top 5 Most Searched People on Google 2026,2027-01-01,false,28.0,27.0,29.0,-2.0,2013,16732,11653
+2026-11-27,7155711,Iran blockade ends: February 28,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-03-01,false,32.5,32.0,33.0,-1.0,1667,28118,44348
+2026-11-27,7155713,Iran blockade ends: January 31,polymarket_iran_blockade,Political,US announces end of Iranian blockade by...?,2027-02-01,false,21.5,21.0,22.0,,4403,80578,63572
